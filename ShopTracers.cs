@@ -14,7 +14,7 @@ namespace ShopTracers
         public override string ModuleName => "[SHOP] Tracers";
         public override string ModuleDescription => "";
         public override string ModuleAuthor => "E!N";
-        public override string ModuleVersion => "v1.0.0";
+        public override string ModuleVersion => "v1.0.1";
 
         private IShopApi? SHOP_API;
         private const string CategoryName = "Tracers";
@@ -46,7 +46,7 @@ namespace ShopTracers
         {
             if (JsonTracers == null || SHOP_API == null) return;
 
-            SHOP_API.CreateCategory(CategoryName, "Ñëåäû îò ïóëü");
+            SHOP_API.CreateCategory(CategoryName, "Ð¡Ð»ÐµÐ´Ñ‹ Ð¾Ñ‚ Ð¿ÑƒÐ»ÑŒ");
 
             var sortedItems = JsonTracers.Properties()
                 .Where(p => p.Value is JObject)
@@ -234,7 +234,20 @@ namespace ShopTracers
             beam.EndPos.Z = endPos.Z;
             beam.DispatchSpawn();
 
-            AddTimer(life, () => { beam.Remove(); });
+            AddTimer(life, () =>
+            {
+                try
+                {
+                    if (beam.IsValid)
+                    {
+                        beam.Remove();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError($"Failed to remove beam entity: {ex.Message}");
+                }
+            });
 
             return ((int)beam.Index, beam);
         }
