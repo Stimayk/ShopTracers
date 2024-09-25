@@ -46,7 +46,7 @@ namespace ShopTracers
         {
             if (JsonTracers == null || SHOP_API == null) return;
 
-            SHOP_API.CreateCategory(CategoryName, "Ñëåäû îò ïóëü");
+            SHOP_API.CreateCategory(CategoryName, "CÐ»ÐµÐ´Ñ‹ Ð¾Ñ‚ Ð¿ÑƒÐ»ÑŒ");
 
             var sortedItems = JsonTracers.Properties()
                 .Where(p => p.Value is JObject)
