@@ -14,7 +14,7 @@ namespace ShopTracers
         public override string ModuleName => "[SHOP] Tracers";
         public override string ModuleDescription => "";
         public override string ModuleAuthor => "E!N";
-        public override string ModuleVersion => "v1.0.1";
+        public override string ModuleVersion => "v1.0.2";
 
         private IShopApi? SHOP_API;
         private const string CategoryName = "Tracers";
@@ -46,7 +46,7 @@ namespace ShopTracers
         {
             if (JsonTracers == null || SHOP_API == null) return;
 
-            SHOP_API.CreateCategory(CategoryName, "Ð¡Ð»ÐµÐ´Ñ‹ Ð¾Ñ‚ Ð¿ÑƒÐ»ÑŒ");
+            SHOP_API.CreateCategory(CategoryName, "Ñëåäû îò ïóëü");
 
             var sortedItems = JsonTracers.Properties()
                 .Where(p => p.Value is JObject)
@@ -93,7 +93,7 @@ namespace ShopTracers
             RegisterListener<Listeners.OnClientDisconnect>(playerSlot => playerTracers[playerSlot] = null!);
         }
 
-        public void OnClientBuyItem(CCSPlayerController player, int itemId, string categoryName, string uniqueName, int buyPrice, int sellPrice, int duration, int count)
+        public HookResult OnClientBuyItem(CCSPlayerController player, int itemId, string categoryName, string uniqueName, int buyPrice, int sellPrice, int duration, int count)
         {
             string color;
             if (uniqueName == "Team")
@@ -107,13 +107,14 @@ namespace ShopTracers
             else if (!TryGetItemColor(uniqueName, out color))
             {
                 Logger.LogError($"{uniqueName} has invalid or missing 'color' in config!");
-                return;
+                return HookResult.Continue;
             }
 
             playerTracers[player.Slot] = new PlayerTracers(color, itemId);
+            return HookResult.Continue;
         }
 
-        public void OnClientToggleItem(CCSPlayerController player, int itemId, string uniqueName, int state)
+        public HookResult OnClientToggleItem(CCSPlayerController player, int itemId, string uniqueName, int state)
         {
             if (state == 1)
             {
@@ -129,7 +130,7 @@ namespace ShopTracers
                 else if (!TryGetItemColor(uniqueName, out color))
                 {
                     Logger.LogError($"{uniqueName} has invalid or missing 'color' in config!");
-                    return;
+                    return HookResult.Continue;
                 }
 
                 playerTracers[player.Slot] = new PlayerTracers(color, itemId);
@@ -138,11 +139,13 @@ namespace ShopTracers
             {
                 OnClientSellItem(player, itemId, uniqueName, 0);
             }
+            return HookResult.Continue;
         }
 
-        public void OnClientSellItem(CCSPlayerController player, int itemId, string uniqueName, int sellPrice)
+        public HookResult OnClientSellItem(CCSPlayerController player, int itemId, string uniqueName, int sellPrice)
         {
             playerTracers[player.Slot] = null!;
+            return HookResult.Continue;
         }
 
         [GameEventHandler(HookMode.Pre)]
